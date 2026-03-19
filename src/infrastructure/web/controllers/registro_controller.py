@@ -3,6 +3,7 @@ from src.domain.use_cases.adicionar_registro_paciente import AdicionarRegistroPa
 from src.domain.use_cases.adicionar_registro_medico import AdicionarRegistroMedicoInputDTO, AdicionarRegistroMedicoUseCase
 from src.domain.use_cases.validar_token import ValidarTokenAcessoUseCase
 from src.domain.use_cases.listar_registros import ListarRegistrosUseCase
+from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
 from src.domain.entities import RegistroTipo
 from src.infrastructure.web.middlewares.auth_middleware import token_obrigatorio
 
@@ -12,7 +13,8 @@ registro_bp = Blueprint('registros', __name__)
 def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarRegistroPacienteUseCase,
                                 adicionar_registro_medico_use_case: AdicionarRegistroMedicoUseCase,
                                 validar_token_use_case: ValidarTokenAcessoUseCase,
-                                listar_registros_use_case: ListarRegistrosUseCase):
+                                listar_registros_use_case: ListarRegistrosUseCase,
+                                validar_dono_use_case: ValidarDonoHistoricoUseCase):
 
     @registro_bp.route('/paciente', methods=['POST'])
     @token_obrigatorio
@@ -90,6 +92,12 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
     @token_obrigatorio
     def listar_registros_paciente(paciente_logado_id, historico_id):
         try:
+
+            validar_dono_use_case.executar(
+                paciente_logado_id=paciente_logado_id,
+                historico_id=historico_id
+            )
+
             lista_registros = listar_registros_use_case.executar_listagem(
                 historico_id=historico_id
             )

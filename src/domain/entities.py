@@ -46,7 +46,13 @@ class Arquivo:
 class Historico:
     paciente_id: int
     criado_em: str
+    titulo: str
+    arquivado: int = 0
+    descricao: Optional[str] = None
     id: Optional[int] = None
+
+    def arquivar(self):
+        self.arquivado = 1
 
 
 @dataclass
