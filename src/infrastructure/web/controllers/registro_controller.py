@@ -104,7 +104,20 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
 
             return jsonify({
                 "historico_id": historico_id,
-                "registros": lista_registros
+                "registros": [
+                    {
+                        "id": r.id,
+                        "historico_id": r.historico_id,
+                        "autor_tipo": r.autor_tipo.value,
+                        "autor_nome": r.autor_nome,
+                        "autor_crm": r.autor_crm,
+                        "tipo": r.tipo.value,
+                        "conteudo": r.conteudo,
+                        "visivel": r.visivel,
+                        "criado_em": str(r.criado_em)
+                    }
+                    for r in lista_registros
+                ]
             }), 200
 
         except ValueError as e:

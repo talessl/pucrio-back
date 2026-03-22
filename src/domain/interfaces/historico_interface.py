@@ -7,3 +7,6 @@ class IHistoricoRepository:
 
     def atualizar_historico(self, historico: Historico) -> Historico:
         pass
+
+    def listar_historicos_paciente(self, paciente_id) -> list[Historico]:
+        pass

@@ -41,7 +41,7 @@ class RegistroRepository(IRegistroRepository):
 
         return registro
 
-    def buscar_por_historico_id(self, historico_id: int) -> list[Registro]:
+    def buscar_por_historico_id(self, historico_id: int) -> list:
         conexao = self.db.get_connection()
         cursor = conexao.cursor()
 
@@ -56,10 +56,10 @@ class RegistroRepository(IRegistroRepository):
             registro = Registro(
                 id=linha['id'],
                 historico_id=linha['historico_id'],
-                autor_tipo=AutorTipo(linha['autor_tipo']),
+                autor_tipo=AutorTipo(linha['autor_tipo']).value,
                 autor_nome=linha['autor_nome'],
                 autor_crm=linha['autor_crm'],
-                tipo=RegistroTipo(linha['tipo']),
+                tipo=RegistroTipo(linha['tipo']).value,
                 conteudo=linha['conteudo'],
                 visivel=linha['visivel'],
                 criado_em=linha['criado_em']

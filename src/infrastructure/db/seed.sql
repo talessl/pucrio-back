@@ -21,5 +21,5 @@ INSERT OR IGNORE INTO registro (id, historico_id, autor_tipo, autor_nome, autor_
 VALUES (3, 1, 'paciente', 'João Silva', NULL, 'sintoma', 'Dor de cabeça frequente.');
 
 -- Token ativo (ID 1)
-INSERT OR IGNORE INTO token (id, historico_id, valor, expira_em)
-VALUES (1, 1, 'tok_abc123xyz456def789', datetime('now', '+48 hours'));
+INSERT OR IGNORE INTO token (id, historico_id, valor, descricao, expira_em)
+VALUES (1, 1, 'tok_abc123xyz456def789', 'Dr. Antonio', datetime('now', '+48 hours'));

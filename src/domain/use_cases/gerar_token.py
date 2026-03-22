@@ -5,10 +5,13 @@ from src.domain.entities import Token
 from src.domain.interfaces.token_interface import ITokenRepository
 from src.domain.interfaces.historico_interface import IHistoricoRepository
 
+
 @dataclass
 class GerarTokenInputDTO:
+    descricao: str
     historico_id: int
-    horas_validade: int = 24 
+    horas_validade: int = 24
+
 
 class GerarTokenUseCase:
     def __init__(self, token_repository: ITokenRepository, historico_repository: IHistoricoRepository):
@@ -16,10 +19,6 @@ class GerarTokenUseCase:
         self.historico_repository = historico_repository
 
     def executar_criacao(self, paciente_logado_id: int, dados: GerarTokenInputDTO) -> Token:
-        historico = self.historico_repository.buscar_historico_por_id(dados.historico_id)
-        
-        if not historico or historico.paciente_id != paciente_logado_id:
-            raise ValueError("Acesso negado: Histórico não encontrado ou não pertence a você.")
 
         codigo_seguro = secrets.token_urlsafe(16)
         valor_token = f"tok_{codigo_seguro}"
@@ -32,6 +31,7 @@ class GerarTokenUseCase:
         expira_em_str = expira.strftime(formato_data)
 
         novo_token = Token(
+            descricao=dados.descricao,
             valor=valor_token,
             historico_id=dados.historico_id,
             criado_em=criado_em_str,

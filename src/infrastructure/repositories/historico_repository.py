@@ -45,3 +45,34 @@ class HistoricoRepository(IHistoricoRepository):
         ))
 
         conexao.commit()
+
+    def listar_historicos_paciente(self, paciente_id):
+        conexao = self.db.get_connection()
+        cursor = conexao.cursor()
+
+        query = """
+            SELECT id, paciente_id, titulo, descricao, arquivado, criado_em 
+            FROM historico 
+            WHERE paciente_id = ?
+            ORDER BY criado_em DESC
+        """
+
+        cursor.execute(query, (paciente_id,))
+        linhas = cursor.fetchall()
+
+        lista_historicos = []
+
+        for linha in linhas:
+
+            historico = Historico(
+                id=linha['id'],
+                paciente_id=linha['paciente_id'],
+                criado_em=linha['criado_em'],
+                titulo=linha['titulo'],
+                descricao=linha['descricao'],
+                arquivado=linha['arquivado'],
+
+            )
+            lista_historicos.append(historico)
+
+        return lista_historicos

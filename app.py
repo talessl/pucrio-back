@@ -29,6 +29,7 @@ from src.domain.use_cases.gerar_token import GerarTokenUseCase
 from src.domain.use_cases.listar_registros import ListarRegistrosUseCase
 from src.domain.use_cases.arquivar_historico import ArquivarHistoricoUseCase
 from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
+from src.domain.use_cases.listar_historicos_paciente import ListarHistoricosPacienteUseCase
 
 
 # controllers
@@ -86,6 +87,8 @@ def create_app():
     arquivar_historico_use_case = ArquivarHistoricoUseCase(
         historico_repository)
     validar_dono_use_case = ValidarDonoHistoricoUseCase(historico_repository)
+    listar_historicos_paciente_use_case = ListarHistoricosPacienteUseCase(
+        historico_repository)
 
     # controllers
     auth_blueprint = iniciar_auth_controller(
@@ -94,9 +97,9 @@ def create_app():
     registro_blueprint = iniciar_registro_controller(
         adicionar_registro_paciente_use_case, adicionar_registro_medico_use_case, validar_token_use_case=validar_token_use_case, listar_registros_use_case=listar_registros_use_case, validar_dono_use_case=validar_dono_use_case)
     token_blueprint = iniciar_token_controller(
-        validar_token_use_case, revogar_token_use_case, gerar_token_use_case)
+        validar_token_use_case, revogar_token_use_case, gerar_token_use_case, validar_dono_historico=validar_dono_use_case)
     historico_blueprint = iniciar_historico_controller(
-        arquivar_historico_use_case)
+        arquivar_historico_use_case, listar_historicos_paciente_use_case)
 
     # rotas
     app.register_blueprint(arquivo_blueprint, url_prefix='/arquivos')

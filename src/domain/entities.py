@@ -74,6 +74,7 @@ class Token:
     historico_id: int
     criado_em: str
     expira_em: str
+    descricao: str
     revogado: int = 0
     id: Optional[int] = None
 

@@ -12,6 +12,6 @@ class ValidarDonoHistoricoUseCase:
         if not historico:
             raise ValueError("Histórico não encontrado.")
 
-        if historico.paciente_id != paciente_logado_id:
+        if int(historico.paciente_id) != int(paciente_logado_id):
             raise ValueError(
                 "Acesso negado. Este histórico não pertence a você.")

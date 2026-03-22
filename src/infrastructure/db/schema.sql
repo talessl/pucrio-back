@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS token (
   criado_em     TEXT NOT NULL DEFAULT (datetime('now')),
   expira_em     TEXT NOT NULL,
   revogado      INTEGER NOT NULL DEFAULT 0,
+  descricao     TEXT NOT NULL,
   FOREIGN KEY (historico_id) REFERENCES historico(id)
 );
 -- registro (append-only)

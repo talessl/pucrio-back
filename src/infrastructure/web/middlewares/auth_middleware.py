@@ -8,6 +8,8 @@ import jwt
 load_dotenv()
 secret_key = os.getenv("SECRET_KEY")
 
+# decorador
+
 
 def token_obrigatorio(f):
     @wraps(f)
