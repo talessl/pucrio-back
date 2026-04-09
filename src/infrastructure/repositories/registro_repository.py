@@ -36,7 +36,6 @@ class RegistroRepository(IRegistroRepository):
         cursor.execute(query, valores)
         conexao.commit()
 
-        # id criado de volta para a entidade
         registro.id = cursor.lastrowid
 
         return registro

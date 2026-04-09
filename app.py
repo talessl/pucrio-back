@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from flasgger import Swagger
 
 from src.infrastructure.db.sqlite_database import SQLiteDatabase
 from src.infrastructure.db.setup import setup_database
@@ -12,6 +13,7 @@ from src.infrastructure.repositories.paciente_repository import PacienteReposito
 from src.infrastructure.repositories.registro_repository import RegistroRepository
 from src.infrastructure.repositories.token_repository import TokenRepository
 from src.infrastructure.repositories.historico_repository import HistoricoRepository
+from src.infrastructure.repositories.upload_repository import UploadRepository
 
 # adapters
 from src.infrastructure.repositories.auth.flask_password_hasher import FlaskPasswordHasher
@@ -26,10 +28,12 @@ from src.domain.use_cases.validar_token import ValidarTokenAcessoUseCase
 from src.domain.use_cases.revogar_token import RevogarTokenUseCase
 from src.domain.use_cases.cadastrar_paciente import CadastrarPacienteUseCase
 from src.domain.use_cases.gerar_token import GerarTokenUseCase
-from src.domain.use_cases.listar_registros import ListarRegistrosUseCase
+from src.domain.use_cases.listar_medicos import ListarMedicosUseCase
+from src.domain.use_cases.listar_registros import listarRegistrosPacienteUseCase
 from src.domain.use_cases.arquivar_historico import ArquivarHistoricoUseCase
 from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
 from src.domain.use_cases.listar_historicos_paciente import ListarHistoricosPacienteUseCase
+from src.domain.use_cases.listar_arquivos import ListarArquivosUseCase
 
 
 # controllers
@@ -49,6 +53,11 @@ from src.infrastructure.web.controllers.historico_controller import iniciar_hist
 
 def create_app():
     app = Flask(__name__)
+    app.config['SWAGGER'] = {
+        'title': 'API do Prontuário Médico',
+        'uiversion': 3
+    }
+    swagger = Swagger(app)
     CORS(app)
     load_dotenv()
     secret_key = os.getenv("SECRET_KEY")
@@ -65,9 +74,12 @@ def create_app():
     registro_repository = RegistroRepository(db)
     token_repository = TokenRepository(db)
     historico_repository = HistoricoRepository(db)
+    upload_repository = UploadRepository(pasta_destino="assets/uploads")
 
     # usecases
-    adicionar_arquivo_use_case = AdicionarArquivoUseCase(arquivo_repository)
+    adicionar_arquivo_use_case = AdicionarArquivoUseCase(
+        arquivo_repository,
+        upload_repo=upload_repository)
     login_use_case = FazerLoginUseCase(
         paciente_repository, hasher=hasher, auth=jwt)
     adicionar_registro_paciente_use_case = AdicionarRegistroPacienteUseCase(
@@ -82,22 +94,27 @@ def create_app():
         hasher=hasher, paciente_repository=paciente_repository)
     gerar_token_use_case = GerarTokenUseCase(
         token_repository=token_repository, historico_repository=historico_repository)
-    listar_registros_use_case = ListarRegistrosUseCase(
+    listar_medicos_use_case = ListarMedicosUseCase(
+        token_repository=token_repository)
+    listar_registros_use_case = listarRegistrosPacienteUseCase(
         registro_repository=registro_repository)
     arquivar_historico_use_case = ArquivarHistoricoUseCase(
         historico_repository)
     validar_dono_use_case = ValidarDonoHistoricoUseCase(historico_repository)
     listar_historicos_paciente_use_case = ListarHistoricosPacienteUseCase(
         historico_repository)
+    listar_arquivo_use_case = ListarArquivosUseCase(
+        arquivo_repository=arquivo_repository)
 
     # controllers
     auth_blueprint = iniciar_auth_controller(
         login_use_case, cadastrar_paciente_use_case=cadastrar_paciente_use_case)
-    arquivo_blueprint = iniciar_arquivo_controller(adicionar_arquivo_use_case)
+    arquivo_blueprint = iniciar_arquivo_controller(
+        adicionar_arquivo_use_case, listar_arquivos_use_case=listar_arquivo_use_case, validar_dono_use_case=validar_dono_use_case, validar_token_use_case=validar_token_use_case)
     registro_blueprint = iniciar_registro_controller(
         adicionar_registro_paciente_use_case, adicionar_registro_medico_use_case, validar_token_use_case=validar_token_use_case, listar_registros_use_case=listar_registros_use_case, validar_dono_use_case=validar_dono_use_case)
     token_blueprint = iniciar_token_controller(
-        validar_token_use_case, revogar_token_use_case, gerar_token_use_case, validar_dono_historico=validar_dono_use_case)
+        validar_token_use_case, revogar_token_use_case, gerar_token_use_case, validar_dono_historico=validar_dono_use_case, listar_medicos_use_case=listar_medicos_use_case)
     historico_blueprint = iniciar_historico_controller(
         arquivar_historico_use_case, listar_historicos_paciente_use_case)
 

@@ -9,6 +9,30 @@ class TokenRepository(ITokenRepository):
     def __init__(self, db: DatabaseInterface):
         self.db = db
 
+    def buscar_por_historico(self, historico_id):
+        conexao = self.db.get_connection()
+        cursor = conexao.cursor()
+
+        query = "SELECT * FROM token WHERE historico_id = ?"
+
+        cursor.execute(query, (historico_id,))
+        linhas = cursor.fetchall()
+
+        lista_token = []
+        for linha in linhas:
+            token = Token(
+                valor=linha['valor'],
+                historico_id=linha['historico_id'],
+                criado_em=linha['criado_em'],
+                expira_em=linha['expira_em'],
+                descricao=linha['descricao'],
+                revogado=linha['revogado'],
+                id=linha['id']
+            )
+            lista_token.append(token)
+
+        return lista_token
+
     def buscar_por_codigo(self, codigo_token):
         conexao = self.db.get_connection()
         cursor = conexao.cursor()
@@ -47,7 +71,8 @@ class TokenRepository(ITokenRepository):
             historico_id=linha['historico_id'],
             criado_em=linha['criado_em'],
             expira_em=linha['expira_em'],
-            revogado=bool(linha['revogado'])
+            revogado=bool(linha['revogado']),
+            descricao=linha['descricao']
         )
 
     def atualizar_revogado(self, token):
@@ -63,6 +88,7 @@ class TokenRepository(ITokenRepository):
         """, (valor_revogado, token.id))
 
         conexao.commit()
+        return cursor.rowcount
 
     def salvar_token(self, token: Token) -> Token:
         conexao = self.db.get_connection()

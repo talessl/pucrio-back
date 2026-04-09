@@ -2,7 +2,7 @@ from src.domain.interfaces.registro_interface import IRegistroRepository
 from src.domain.entities import Registro
 
 
-class ListarRegistrosUseCase:
+class listarRegistrosPacienteUseCase:
     def __init__(self, registro_repository: IRegistroRepository):
         self.registro_repository = registro_repository
 

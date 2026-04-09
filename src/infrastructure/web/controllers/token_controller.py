@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import os
 from src.domain.use_cases.validar_token import ValidarTokenAcessoUseCase
 from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
+from src.domain.use_cases.listar_medicos import ListarMedicosUseCase
 from src.domain.use_cases.revogar_token import RevogarTokenUseCase
 from src.domain.use_cases.gerar_token import GerarTokenInputDTO, GerarTokenUseCase
 from src.infrastructure.web.middlewares.auth_middleware import token_obrigatorio
@@ -11,7 +12,8 @@ token_bp = Blueprint('tokens', __name__)
 base_url = os.getenv("BASE_URL", "http://localhost:5500")
 
 
-def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revogar_use_case: RevogarTokenUseCase, gerar_token_use_case: GerarTokenUseCase, validar_dono_historico: ValidarDonoHistoricoUseCase):
+def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revogar_use_case: RevogarTokenUseCase, gerar_token_use_case: GerarTokenUseCase, validar_dono_historico: ValidarDonoHistoricoUseCase,
+                             listar_medicos_use_case: ListarMedicosUseCase):
 
     @token_bp.route('/medico/<codigo_token>', methods=['GET'])
     def validar_link_medico(codigo_token):
@@ -65,6 +67,33 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
                 "link": url_magica,
                 "expira_em": token_gerado.expira_em
             }), 201
+
+        except ValueError as e:
+            return jsonify({"erro": str(e)}), 400
+
+    @token_bp.route('/paciente/historico/<int:historico_id>', methods=['GET'])
+    @token_obrigatorio
+    def listar_medicos(paciente_logado_id, historico_id):
+        try:
+            validar_dono_historico.executar(
+                paciente_logado_id=paciente_logado_id,
+                historico_id=historico_id
+            )
+            lista_medicos = listar_medicos_use_case.exectuar_listagem(
+                historico_id=historico_id)
+
+            return jsonify({
+                "historico_id": historico_id,
+                "medicos": [
+                    {
+                        "descricao": m.descricao,
+                        "expira_em": m.expira_em,
+                        "revogado": m.revogado,
+                        "id": m.id
+                    }
+                    for m in lista_medicos
+                ]
+            }), 200
 
         except ValueError as e:
             return jsonify({"erro": str(e)}), 400

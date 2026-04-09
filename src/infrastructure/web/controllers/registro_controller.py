@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from src.domain.use_cases.adicionar_registro_paciente import AdicionarRegistroPacienteInputDTO, AdicionarRegistroPacienteUseCase
 from src.domain.use_cases.adicionar_registro_medico import AdicionarRegistroMedicoInputDTO, AdicionarRegistroMedicoUseCase
 from src.domain.use_cases.validar_token import ValidarTokenAcessoUseCase
-from src.domain.use_cases.listar_registros import ListarRegistrosUseCase
+from src.domain.use_cases.listar_registros import listarRegistrosPacienteUseCase
 from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
 from src.domain.entities import RegistroTipo
 from src.infrastructure.web.middlewares.auth_middleware import token_obrigatorio
@@ -13,12 +13,59 @@ registro_bp = Blueprint('registros', __name__)
 def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarRegistroPacienteUseCase,
                                 adicionar_registro_medico_use_case: AdicionarRegistroMedicoUseCase,
                                 validar_token_use_case: ValidarTokenAcessoUseCase,
-                                listar_registros_use_case: ListarRegistrosUseCase,
+                                listar_registros_use_case: listarRegistrosPacienteUseCase,
                                 validar_dono_use_case: ValidarDonoHistoricoUseCase):
 
     @registro_bp.route('/paciente', methods=['POST'])
     @token_obrigatorio
     def criar_registro_paciente(paciente_logado_id):
+        """
+        Adiciona um novo registro ao histórico do paciente.
+        ---
+        tags:
+          - Registros Paciente
+        security:
+          - Bearer: []
+        parameters:
+          - in: body
+            name: body
+            description: Dados do registro a ser criado.
+            required: true
+            schema:
+              type: object
+              properties:
+                historico_id:
+                  type: integer
+                  example: 1
+                tipo:
+                  type: string
+                  example: "SINTOMA"
+                conteudo:
+                  type: string
+                  example: "Dor de cabeça forte ao acordar."
+        responses:
+          201:
+            description: Registro criado com sucesso.
+            schema:
+              type: object
+              properties:
+                mensagem:
+                  type: string
+                  example: "Registro criado"
+                id:
+                  type: integer
+                  example: 42
+          400:
+            description: Erro de validação nos dados enviados.
+            schema:
+              type: object
+              properties:
+                erro:
+                  type: string
+                  example: "Tipo de registro inválido."
+          401:
+            description: Token ausente ou inválido.
+        """
         dados = request.get_json()
 
         try:
@@ -108,10 +155,10 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
                     {
                         "id": r.id,
                         "historico_id": r.historico_id,
-                        "autor_tipo": r.autor_tipo.value,
+                        "autor_tipo": r.autor_tipo,
                         "autor_nome": r.autor_nome,
                         "autor_crm": r.autor_crm,
-                        "tipo": r.tipo.value,
+                        "tipo": r.tipo,
                         "conteudo": r.conteudo,
                         "visivel": r.visivel,
                         "criado_em": str(r.criado_em)

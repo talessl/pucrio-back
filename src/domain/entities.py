@@ -39,6 +39,7 @@ class Arquivo:
     nome_original: str
     descricao: str
     visivel: int = 1
+    criado_em: Optional[str] = None
     id: Optional[int] = None
 
 
