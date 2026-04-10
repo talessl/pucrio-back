@@ -13,7 +13,6 @@ class ValidarTokenAcessoUseCase:
 
         return {
             "id": token.id,
-            "valor": token.valor,
             "historico_id": token.historico_id,
             "expira_em": token.expira_em,
             "descricao": token.descricao

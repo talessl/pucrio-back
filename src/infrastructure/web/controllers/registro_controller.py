@@ -16,76 +16,44 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
                                 listar_registros_use_case: listarRegistrosPacienteUseCase,
                                 validar_dono_use_case: ValidarDonoHistoricoUseCase):
 
-    @registro_bp.route('/paciente', methods=['POST'])
-    @token_obrigatorio
-    def criar_registro_paciente(paciente_logado_id):
+    @registro_bp.route('/medico/<codigo_token>', methods=['POST'])
+    def criar_registro_medico(codigo_token):
         """
-        Adiciona um novo registro ao histórico do paciente.
+        Adiciona um diagnóstico/registro médico usando um token mágico.
         ---
         tags:
-          - Registros Paciente
-        security:
-          - Bearer: []
+          - Registros Médico
         parameters:
+          - in: path
+            name: codigo_token
+            type: string
+            required: true
+            description: Código do token de acesso do médico.
           - in: body
             name: body
-            description: Dados do registro a ser criado.
+            description: Dados do diagnóstico médico.
             required: true
             schema:
               type: object
               properties:
-                historico_id:
-                  type: integer
-                  example: 1
+                autor_nome:
+                  type: string
+                  example: "Dr. Carlos Silva"
+                autor_crm:
+                  type: string
+                  example: "CRM/SP 123456"
                 tipo:
                   type: string
-                  example: "SINTOMA"
+                  example: "DIAGNOSTICO"
                 conteudo:
                   type: string
-                  example: "Dor de cabeça forte ao acordar."
+                  example: "Paciente apresenta quadro de enxaqueca."
         responses:
           201:
-            description: Registro criado com sucesso.
-            schema:
-              type: object
-              properties:
-                mensagem:
-                  type: string
-                  example: "Registro criado"
-                id:
-                  type: integer
-                  example: 42
+            description: Diagnóstico médico salvo com sucesso.
           400:
-            description: Erro de validação nos dados enviados.
-            schema:
-              type: object
-              properties:
-                erro:
-                  type: string
-                  example: "Tipo de registro inválido."
-          401:
-            description: Token ausente ou inválido.
+            description: Erro de validação ou dados incompletos.
         """
-        dados = request.get_json()
-
-        try:
-
-            input_dto = AdicionarRegistroPacienteInputDTO(
-                historico_id=dados.get('historico_id'),
-                tipo=RegistroTipo(dados.get('tipo')),
-                conteudo=dados.get('conteudo')
-            )
-
-            registro_salvo = adicionar_registro_paciente_use_case.executar_adicao_registro_paciente(
-                paciente_logado_id, input_dto)
-
-            return jsonify({"mensagem": "Registro criado", "id": registro_salvo.id}), 201
-
-        except ValueError as e:
-            return jsonify({"erro": str(e)}), 400
-
-    @registro_bp.route('/medico/<codigo_token>', methods=['POST'])
-    def criar_registro_medico(codigo_token):
         dados = request.get_json()
 
         autor_nome = dados.get('autor_nome')
@@ -119,6 +87,23 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
 
     @registro_bp.route('/medico/<codigo_token>', methods=['GET'])
     def listar_registros_medico(codigo_token):
+        """
+        Lista os registros de um histórico para o médico usando o token.
+        ---
+        tags:
+          - Registros Médico
+        parameters:
+          - in: path
+            name: codigo_token
+            type: string
+            required: true
+            description: Código do token de acesso mágico.
+        responses:
+          200:
+            description: Lista de registros recuperada com sucesso.
+          404:
+            description: Token inválido ou não encontrado.
+        """
         try:
             dados_token = validar_token_use_case.executar_validacao(
                 codigo_token)
@@ -128,6 +113,8 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
                 historico_id_seguro)
 
             return jsonify({
+                "nome_medico": dados_token['descricao'],
+                "expira_em": dados_token['expira_em'],
                 "historico_id": historico_id_seguro,
                 "registros": lista_registros
             }), 200
@@ -138,6 +125,25 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
     @registro_bp.route('/paciente/historico/<int:historico_id>', methods=['GET'])
     @token_obrigatorio
     def listar_registros_paciente(paciente_logado_id, historico_id):
+        """
+        Lista os registros de um histórico específico do paciente.
+        ---
+        tags:
+          - Registros Paciente
+        security:
+          - Bearer: []
+        parameters:
+          - in: path
+            name: historico_id
+            type: integer
+            required: true
+            description: ID do histórico do paciente.
+        responses:
+          200:
+            description: Lista de registros recuperada com sucesso.
+          400:
+            description: Erro na listagem ou histórico não pertence ao usuário.
+        """
         try:
 
             validar_dono_use_case.executar(

@@ -17,6 +17,23 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
 
     @token_bp.route('/medico/<codigo_token>', methods=['GET'])
     def validar_link_medico(codigo_token):
+        """
+    Valida um token de acesso médico.
+    ---
+    tags:
+      - Tokens
+    parameters:
+      - in: path
+        name: codigo_token
+        type: string
+        required: true
+        description: Código do token de acesso médico.
+    responses:
+      200:
+        description: Token válido.
+      404:
+        description: Token inválido ou expirado.
+    """
         try:
             dados_token = validar_use_case.executar_validacao(codigo_token)
 
@@ -31,6 +48,25 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
     @token_bp.route('/paciente/<int:token_id>/revogar', methods=['PATCH'])
     @token_obrigatorio
     def revogar_acesso_medico(paciente_logado_id, token_id):
+        """
+    Revoga um token de acesso médico do paciente autenticado.
+    ---
+    tags:
+      - Tokens
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: token_id
+        type: integer
+        required: true
+        description: ID do token a ser revogado.
+    responses:
+      200:
+        description: Acesso revogado com sucesso.
+      400:
+        description: Token não encontrado ou não pertence ao paciente.
+    """
         try:
             revogar_use_case.executar_revogacao(paciente_logado_id, token_id)
 
@@ -42,6 +78,38 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
     @token_bp.route('/', methods=['POST'])
     @token_obrigatorio
     def gerar_token_acesso(paciente_logado_id):
+        """
+    Gera um token de acesso médico para um histórico do paciente autenticado.
+    ---
+    tags:
+      - Tokens
+    security:
+      - Bearer: []
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - historico_id
+            - descricao
+          properties:
+            historico_id:
+              type: integer
+              description: ID do histórico do paciente.
+            descricao:
+              type: string
+              description: Nome ou descrição do acesso.
+            horas_validade:
+              type: integer
+              description: Validade do token em horas (padrão 24).
+    responses:
+      201:
+        description: Token gerado com sucesso.
+      400:
+        description: Dados inválidos ou histórico não pertence ao paciente.
+    """
         dados = request.get_json()
         try:
 
@@ -74,6 +142,25 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
     @token_bp.route('/paciente/historico/<int:historico_id>', methods=['GET'])
     @token_obrigatorio
     def listar_medicos(paciente_logado_id, historico_id):
+        """
+    Lista os tokens de acesso médico de um histórico do paciente autenticado.
+    ---
+    tags:
+      - Tokens
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: historico_id
+        type: integer
+        required: true
+        description: ID do histórico do paciente.
+    responses:
+      200:
+        description: Lista de acessos médicos recuperada com sucesso.
+      400:
+        description: Erro na listagem ou histórico não pertence ao paciente.
+    """
         try:
             validar_dono_historico.executar(
                 paciente_logado_id=paciente_logado_id,

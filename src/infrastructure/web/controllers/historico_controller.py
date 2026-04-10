@@ -8,24 +8,22 @@ historico_bp = Blueprint('historicos', __name__)
 
 def iniciar_historico_controller(historico_use_case: ArquivarHistoricoUseCase, listar_use_case):
 
-    @historico_bp.route('/historico/<int:historico_id>/arquivar', methods=['PATCH'])
-    @token_obrigatorio
-    def arquivar_historico_paciente(paciente_logado_id, historico_id):
-
-        try:
-            historico_use_case.executar_arquivamento(
-                paciente_logado_id=paciente_logado_id,
-                historico_id=historico_id
-            )
-
-            return jsonify({"mensagem": "Histórico arquivado com sucesso!"}), 200
-
-        except ValueError as e:
-            return jsonify({"erro": str(e)}), 400
-
     @historico_bp.route('/historico', methods=['GET'])
-    @token_obrigatorio  # run before
+    @token_obrigatorio
     def listar_historicos_paciente(paciente_logado_id):
+        """
+        Lista todos os históricos do paciente logado.
+        ---
+        tags:
+          - Históricos
+        security:
+          - Bearer: []
+        responses:
+          200:
+            description: Lista de históricos recuperada com sucesso.
+          400:
+            description: Erro na busca dos históricos.
+        """
         try:
 
             lista_historicos = listar_use_case.executar_listagem(
