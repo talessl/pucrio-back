@@ -36,7 +36,7 @@ pip install -r requirements.txt
 ```
 
 **4. Execução do Sistema**
-Pronto, o ambiente está preparado! Certifique-se de que você está na pasta raiz do projeto (`pucrio-back`) e inicie a aplicação:
+Pronto, o ambiente está preparado! Certifique-se de que você está na pasta raiz do projeto (`prontnote-back`) e inicie a aplicação:
 ```bash
 python app.py
 ```
