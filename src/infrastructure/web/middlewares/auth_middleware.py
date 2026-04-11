@@ -1,12 +1,10 @@
-import os
 from dotenv import load_dotenv
 
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 import jwt
 
 load_dotenv()
-secret_key = os.getenv("SECRET_KEY")
 
 # decorador
 
@@ -28,7 +26,7 @@ def token_obrigatorio(f):
 
         try:
 
-            payload = jwt.decode(token, secret_key, algorithms=[
+            payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=[
                                  "HS256"], options={"verify_sub": False})
 
             paciente_id = payload['sub']

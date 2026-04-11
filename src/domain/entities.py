@@ -46,9 +46,9 @@ class Arquivo:
 @dataclass
 class Historico:
     paciente_id: int
-    criado_em: str
     titulo: str
     arquivado: int = 0
+    criado_em: Optional[str] = None
     descricao: Optional[str] = None
     id: Optional[int] = None
 

@@ -10,3 +10,6 @@ class IHistoricoRepository:
 
     def listar_historicos_paciente(self, paciente_id) -> list[Historico]:
         pass
+
+    def criar_historico(self, historico: Historico) -> Historico:
+        pass

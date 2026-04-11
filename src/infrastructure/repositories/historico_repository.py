@@ -76,3 +76,25 @@ class HistoricoRepository(IHistoricoRepository):
             lista_historicos.append(historico)
 
         return lista_historicos
+
+    def criar_historico(self, historico: Historico):
+        conexao = self.db.get_connection()
+        cursor = conexao.cursor()
+
+        query = """
+            INSERT INTO historico (paciente_id, titulo, descricao, arquivado)
+            VALUES (?, ?, ?, ?)
+        """
+
+        cursor.execute(query, (
+            historico.paciente_id,
+            historico.titulo,
+            historico.descricao,
+            historico.arquivado,
+        ))
+
+        conexao.commit()
+
+        historico.id = cursor.lastrowid
+
+        return historico

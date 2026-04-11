@@ -34,6 +34,7 @@ from src.domain.use_cases.arquivar_historico import ArquivarHistoricoUseCase
 from src.domain.use_cases.validar_dono_historico import ValidarDonoHistoricoUseCase
 from src.domain.use_cases.listar_historicos_paciente import ListarHistoricosPacienteUseCase
 from src.domain.use_cases.listar_arquivos import ListarArquivosUseCase
+from src.domain.use_cases.adicionar_historico import AdicionarHistoricoUseCase
 
 
 # controllers
@@ -52,20 +53,26 @@ from src.infrastructure.web.controllers.historico_controller import iniciar_hist
 
 
 def create_app():
+    load_dotenv()
+
     app = Flask(__name__)
+
     app.config['SWAGGER'] = {
-        'title': 'API do Prontuário Médico',
+        'title': 'API do ProntNote',
         'uiversion': 3
     }
+
+    app.config['SECRET_KEY'] = os.getenv(
+        "SECRET_KEY", "chave_padrao_para_o_mvp_da_faculdade")
+
     swagger = Swagger(app)
     CORS(app)
-    load_dotenv()
-    secret_key = os.getenv("SECRET_KEY")
 
     db = SQLiteDatabase("database.db")
     setup_database(db)
 
-    jwt = JwtAuthGenerator(secret_key=secret_key, expiracao_horas=72)
+    jwt = JwtAuthGenerator(
+        secret_key=app.config['SECRET_KEY'], expiracao_horas=72)
     hasher = FlaskPasswordHasher()
 
     # repositorios
@@ -98,13 +105,14 @@ def create_app():
         token_repository=token_repository)
     listar_registros_use_case = listarRegistrosPacienteUseCase(
         registro_repository=registro_repository)
-    arquivar_historico_use_case = ArquivarHistoricoUseCase(
-        historico_repository)
     validar_dono_use_case = ValidarDonoHistoricoUseCase(historico_repository)
     listar_historicos_paciente_use_case = ListarHistoricosPacienteUseCase(
         historico_repository)
     listar_arquivo_use_case = ListarArquivosUseCase(
         arquivo_repository=arquivo_repository)
+    criar_historico_use_case = AdicionarHistoricoUseCase(
+        historico_repo=historico_repository
+    )
 
     # controllers
     auth_blueprint = iniciar_auth_controller(
@@ -116,7 +124,7 @@ def create_app():
     token_blueprint = iniciar_token_controller(
         validar_token_use_case, revogar_token_use_case, gerar_token_use_case, validar_dono_historico=validar_dono_use_case, listar_medicos_use_case=listar_medicos_use_case)
     historico_blueprint = iniciar_historico_controller(
-        arquivar_historico_use_case, listar_historicos_paciente_use_case)
+        criar_historico_use_case=criar_historico_use_case, listar_use_case=listar_historicos_paciente_use_case)
 
     # rotas
     app.register_blueprint(arquivo_blueprint, url_prefix='/arquivos')

@@ -42,7 +42,7 @@ INSERT OR IGNORE INTO token (id, historico_id, valor, descricao, expira_em) VALU
 -- Arquivos — Histórico 1
 INSERT OR IGNORE INTO arquivo (id, historico_id, enviado_por, tipo, nome_original, url, descricao) VALUES
   (1, 1, 'medico',   'exame',     'hemograma_completo.jpg',   'assets/uploads/hemograma_completo.jpg',   'Hemograma completo — Jan 2025'),
-  (2, 1, 'paciente', 'documento', 'cartao_convenio.pdf',      'assets/uploads/cartao_convenio.pdf',      'Cartão do convênio médico');
+  (2, 1, 'paciente', 'documento', 'cartao_convenio.png',      'assets/uploads/cartao_convenio.png',      'Cartão do convênio médico');
 
 -- Arquivos — Histórico 2
 INSERT OR IGNORE INTO arquivo (id, historico_id, enviado_por, tipo, nome_original, url, descricao) VALUES
