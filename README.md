@@ -41,6 +41,15 @@ Pronto, o ambiente está preparado! Certifique-se de que você está na pasta ra
 python app.py
 ```
 > **💡 O que acontece nos bastidores?** > Esse único comando é inteligente: ele configura todo o ambiente, cria as tabelas do banco de dados (schema), insere alguns dados de teste (seed) e coloca a API no ar!
+---
+
+Utilize os seguintes dados cadastrais para testes:
+
+email: paciente@teste.com
+
+senha: 12345
+
+---
 
 **5. Visualização da Documentação (Swagger)**
 Com o servidor rodando, você pode testar as rotas de forma visual e interativa. Basta abrir o seu navegador e acessar o link abaixo:
