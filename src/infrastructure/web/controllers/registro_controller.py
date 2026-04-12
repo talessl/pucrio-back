@@ -41,10 +41,10 @@ def iniciar_registro_controller(adicionar_registro_paciente_use_case: AdicionarR
                   example: "Dr. Carlos Silva"
                 autor_crm:
                   type: string
-                  example: "CRM/SP 123456"
+                  example: "123456/SP"
                 tipo:
                   type: string
-                  example: "DIAGNOSTICO"
+                  example: "diagnostico"
                 conteudo:
                   type: string
                   example: "Paciente apresenta quadro de enxaqueca."

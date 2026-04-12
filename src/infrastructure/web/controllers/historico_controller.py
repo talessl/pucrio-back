@@ -18,6 +18,20 @@ def iniciar_historico_controller(criar_historico_use_case, listar_use_case):
           - Históricos
         security:
           - Bearer: []
+        parameters:
+          - in: body
+            name: body
+            description: Dados do histórico (O paciente_id é extraído automaticamente do seu Token).
+            required: true
+            schema:
+              type: object
+              properties:
+                titulo:
+                  type: string
+                  example: "Acompanhamento Cardiológico"
+                descricao:
+                  type: string
+                  example: "Exames de rotina e receituários do coração."
         responses:
           201:
             description: Histórico criado com sucesso.

@@ -65,7 +65,31 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv(
         "SECRET_KEY", "chave_padrao_para_o_mvp_da_faculdade")
 
-    swagger = Swagger(app)
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": 'apispec_1',
+                "route": '/apispec_1.json',
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/apidocs/",
+        "securityDefinitions": {
+            "Bearer": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "description": "Insira o token recebido no login no formato: Bearer <seu_token_aqui>"
+            }
+        }
+    }
+
+    swagger = Swagger(app, config=swagger_config)
+
     CORS(app)
 
     db = SQLiteDatabase("database.db")

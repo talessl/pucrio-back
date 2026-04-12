@@ -98,12 +98,15 @@ def iniciar_token_controller(validar_use_case: ValidarTokenAcessoUseCase, revoga
             historico_id:
               type: integer
               description: ID do histórico do paciente.
+              example: 1
             descricao:
               type: string
-              description: Nome ou descrição do acesso.
+              description: Nome do médico acesso.
+              example: Dr Carlos - Oftalmo
             horas_validade:
               type: integer
               description: Validade do token em horas (padrão 24).
+              example: 24
     responses:
       201:
         description: Token gerado com sucesso.

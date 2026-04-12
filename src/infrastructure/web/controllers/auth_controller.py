@@ -27,10 +27,10 @@ def iniciar_auth_controller(login_use_case, cadastrar_paciente_use_case):
               properties:
                 email:
                   type: string
-                  example: "joao@email.com"
+                  example: "paciente@teste.com"
                 senha:
                   type: string
-                  example: "senha123"
+                  example: "12345"
         responses:
           200:
             description: Login realizado com sucesso.

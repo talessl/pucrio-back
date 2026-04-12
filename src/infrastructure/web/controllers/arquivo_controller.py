@@ -42,7 +42,7 @@ def iniciar_arquivo_controller(use_case, listar_arquivos_use_case: ListarArquivo
         name: tipo
         type: string
         required: true
-        description: Tipo do arquivo.
+        description: Tipo do arquivo (exame, documento, laudo).
       - in: formData
         name: descricao
         type: string
@@ -52,7 +52,7 @@ def iniciar_arquivo_controller(use_case, listar_arquivos_use_case: ListarArquivo
         name: enviado_por
         type: string
         required: true
-        description: Autor do envio.
+        description: Tipo de autor do envio (medico ou paciente).
     responses:
       201:
         description: Arquivo criado com sucesso.
@@ -128,7 +128,7 @@ def iniciar_arquivo_controller(use_case, listar_arquivos_use_case: ListarArquivo
         name: tipo
         type: string
         required: true
-        description: Tipo do arquivo.
+        description: Tipo do arquivo (exame, documento, laudo).
       - in: formData
         name: descricao
         type: string
@@ -138,7 +138,7 @@ def iniciar_arquivo_controller(use_case, listar_arquivos_use_case: ListarArquivo
         name: enviado_por
         type: string
         required: true
-        description: Autor do envio.
+        description: Tipo de autor do envio (medico ou paciente).
     responses:
       201:
         description: Arquivo criado com sucesso.
@@ -304,6 +304,7 @@ def iniciar_arquivo_controller(use_case, listar_arquivos_use_case: ListarArquivo
         type: string
         required: true
         description: Nome do arquivo a ser servido.
+        example: "autorizacao_plano.png"
     responses:
       200:
         description: Arquivo retornado com sucesso.
